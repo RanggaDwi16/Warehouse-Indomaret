@@ -1,0 +1,411 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+
+/**
+ *
+ * @author ASUS
+ */
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.InputStream;
+import java.sql.*;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
+
+public class FormKartuStok extends javax.swing.JDialog {
+
+    /**
+     * Creates new form FormMain
+     *
+     * @param parent
+     * @param modal
+     */
+    KoneksiMySql koneksi = new KoneksiMySql();
+    PetugasSession PetugasSession = new PetugasSession();
+
+    Connection Con;
+    ResultSet RsJual;
+    Statement stm;
+    String tgl1, tgl2;
+    private Object[][] dataTable = null;
+    private String[] header = {"Tanggal", "Kode Pelanggan/Supplier", "Nama Pelanggan/Supplier", "Kode Barang",
+        "Nama Barang", "Awal", "Masuk", "Keluar", "Akhir"};
+    DefaultTableModel tableModel = new DefaultTableModel(
+            new Object[][]{}, header);
+
+    public FormKartuStok(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        initComponents();
+        initUI();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        dtAwal.setDateFormat(sdf);
+        dtAkhir.setDateFormat(sdf);
+        open_db();
+
+    }
+
+    private void initUI() {
+        Dimension windowSize = getSize();
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        Point centerPoint = ge.getCenterPoint();
+        int dx = centerPoint.x - windowSize.width / 2;
+        int dy = centerPoint.y - windowSize.height / 2;
+        setLocation(dx, dy);
+    }
+
+    private void format_tanggal() {
+        String DATE_FORMAT = "yyyy-MM-dd";
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
+        Calendar c1 = Calendar.getInstance();
+        int year = c1.get(Calendar.YEAR);
+        int month = c1.get(Calendar.MONTH) + 1;
+        int day = c1.get(Calendar.DAY_OF_MONTH);
+        tgl1 = dtAwal.getText();
+        tgl2 = dtAkhir.getText();
+        System.out.println("Tanggal : " + tgl1);
+        System.out.println("Tanggal2 : " + tgl2);
+    }
+
+    private void open_db() {
+        try {
+            KoneksiMySql kon = new KoneksiMySql();
+            Con = kon.getConnection();
+        } catch (Exception e) {
+            System.out.println("Error : " + e);
+        }
+    }
+
+    private void baca_data() {
+        try {
+            tgl1 = dtAwal.getText();
+            tgl2 = dtAkhir.getText();
+            stm = Con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            RsJual = stm.executeQuery("select * from v_stok where date(Tanggal)>=" + "date('" + tgl1 + "') and date(Tanggal)<=" + "date('" + tgl2 + "')");
+            ResultSetMetaData meta = RsJual.getMetaData();
+            int col = meta.getColumnCount();
+            int baris = 0;
+            while (RsJual.next()) {
+                baris = RsJual.getRow();
+            }
+//            CustomFormat cf = new CustomFormat();
+            dataTable = new Object[baris][col];
+            int x = 0;
+            RsJual.beforeFirst();
+            while (RsJual.next()) {
+                dataTable[x][0] = RsJual.getDate("Tanggal");
+                dataTable[x][1] = RsJual.getString("KodePelangganKodeSupplier");
+                dataTable[x][2] = RsJual.getString("NamaPelangganNamaSupplier");
+                dataTable[x][3] = RsJual.getString("KodeBarang");
+                dataTable[x][4] = RsJual.getString("NamaBarang");
+                dataTable[x][5] = RsJual.getInt("StokAwal");
+                dataTable[x][6] = RsJual.getInt("Masuk");
+                dataTable[x][7] = RsJual.getInt("Keluar");
+                dataTable[x][8] = RsJual.getInt("StokAkhir");
+                x++;
+            }
+            tableStok.setModel(new DefaultTableModel(dataTable, header));
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        dtAwal = new datechooser.beans.DateChooserCombo();
+        jLabel3 = new javax.swing.JLabel();
+        dtAkhir = new datechooser.beans.DateChooserCombo();
+        btnCari = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tableStok = new javax.swing.JTable();
+        btnExport = new javax.swing.JButton();
+        btnCetak = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Form Kartu Stok Barang");
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel4.setBackground(new java.awt.Color(0, 102, 204));
+
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel12.setText("Kartu Stok Barang");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap(591, Short.MAX_VALUE)
+                .addComponent(jLabel12)
+                .addGap(570, 570, 570))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(jLabel12)
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Logo_Indomaret (2).png"))); // NOI18N
+
+        jLabel2.setText("Tanggal Awal");
+
+        jLabel3.setText("Tanggal Akhir");
+
+        btnCari.setText("Cari");
+        btnCari.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnCariMouseClicked(evt);
+            }
+        });
+        btnCari.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCariActionPerformed(evt);
+            }
+        });
+
+        tableStok.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Tanggal", "Kode Pelanggan / Supplier", "Nama Pelanggan / Supplier", "Kode Barang", "Nama Barang", "Awal", "Masuk", "Keluar", "Akhir"
+            }
+        ));
+        tableStok.setSelectionBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane1.setViewportView(tableStok);
+
+        btnExport.setText("Export Excel");
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+
+        btnCetak.setText("Cetak ");
+        btnCetak.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCetakActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(75, 75, 75)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(dtAwal, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(49, 49, 49)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(dtAkhir, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(32, 32, 32)
+                                .addComponent(btnCari))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnCetak, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1179, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(483, 483, 483))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(dtAkhir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(dtAwal, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnCari)))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnExport)
+                    .addComponent(btnCetak))
+                .addContainerGap(49, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCariActionPerformed
+        // TODO add your handling code here:
+        baca_data();
+    }//GEN-LAST:event_btnCariActionPerformed
+
+    private void btnCariMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCariMouseClicked
+        // TODO add your handling code here:
+        baca_data();
+    }//GEN-LAST:event_btnCariMouseClicked
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        // TODO add your handling code here:
+        try {
+            ExportToExcel ex = new ExportToExcel(tableStok, new File("KartuStok.xls"));
+            JOptionPane.showMessageDialog(null, "Sukses Export data");
+            Desktop desktop = Desktop.getDesktop();
+            desktop.open(new File("KartuStok.xls"));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }//GEN-LAST:event_btnExportActionPerformed
+
+    private void btnCetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCetakActionPerformed
+        // TODO add your handling code here:
+        try {
+            this.setVisible(false);
+
+            InputStream file = getClass().getResourceAsStream("/report/KartuStok.jrxml");
+            JasperDesign jasperDesign = JRXmlLoader.load(file);
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("date1", dtAwal.getText()); // Replace dtAwal.getText() with the appropriate source of the start date
+            parameters.put("date2", dtAkhir.getText()); // Replace dtAkhir.getText() with the appropriate source of the end date
+
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, koneksi.getConnection());
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
+            jasperViewer.setVisible(true);
+
+            jasperViewer.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    setVisible(true); // Show the form laporan when JasperViewer is closed
+                }
+            });
+            jasperViewer.toFront();
+        } catch (ClassNotFoundException | JRException e) {
+            JOptionPane.showMessageDialog(null, "Error " + e);
+        }
+    }//GEN-LAST:event_btnCetakActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(FormKartuStok.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(FormKartuStok.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(FormKartuStok.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(FormKartuStok.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(() -> {
+            FormKartuStok dialog = new FormKartuStok(new javax.swing.JFrame(), true);
+            dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                    System.exit(0);
+                }
+            });
+            dialog.setVisible(true);
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCari;
+    private javax.swing.JButton btnCetak;
+    private javax.swing.JButton btnExport;
+    private datechooser.beans.DateChooserCombo dtAkhir;
+    private datechooser.beans.DateChooserCombo dtAwal;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tableStok;
+    // End of variables declaration//GEN-END:variables
+}
